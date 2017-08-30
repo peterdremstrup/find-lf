@@ -25,7 +25,7 @@ def restart_wifi():
     os.system("iwconfig wlan0 mode managed")
     while True:
         ping_response = subprocess.Popen(
-            ["/bin/ping", "-c1", "-w100", "lf.internalpositioning.com"], stdout=subprocess.PIPE).stdout.read()
+            ["/bin/ping", "-c1", "-w100", "emerson.local"], stdout=subprocess.PIPE).stdout.read()
         if '64 bytes' in ping_response.decode('utf-8'):
             break
         time.sleep(1)
@@ -44,14 +44,14 @@ def process_scan(time_window):
     output = ""
     maxFileNumber = -1
     fileNameToRead = ""
-    for filename in glob.glob("/tmp/tshark-temp*"):
+    for filename in glob.glob("/tmp/plugoutbeacon"):
         fileNumber = int(filename.split("_")[1])
         if fileNumber > maxFileNumber:
             maxFileNumber = fileNumber
             fileNameToRead = filename
 
     logger.debug("Reading from %s" % fileNameToRead)
-    cmd = subprocess.Popen(("tshark -r "+fileNameToRead+" -T fields -e frame.time_epoch -e wlan.sa -e wlan.bssid -e radiotap.dbm_antsignal").split(
+    cmd = subprocess.Popen(("tail /tmp/plugoutbeacon").split(
     ), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output += cmd.stdout.read().decode('utf-8')
 
@@ -64,7 +64,7 @@ def process_scan(time_window):
 
             if mac == mac2 or float(timestamp) < timestamp_threshold or len(mac) == 0:
                 continue
-            
+
             relevant_lines+=1
             rssi = power_levels.split(',')[0]
             if len(rssi) == 0:
@@ -111,7 +111,7 @@ def tshark_is_running():
     ps_output = subprocess.Popen(
         "ps aux".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     ps_stdout = ps_output.stdout.read().decode('utf-8')
-    isRunning = 'tshark' in ps_stdout and '[tshark]' not in ps_stdout
+    isRunning = 'grabserial' in ps_stdout and '[grabserial]' not in ps_stdout
     logger.debug("tshark is running: " + str(isRunning))
     return isRunning
 
@@ -119,9 +119,9 @@ def tshark_is_running():
 def start_scan(wlan):
     if not tshark_is_running():
         # Remove previous files
-        for filename in glob.glob("/tmp/tshark-temp*"):
+        for filename in glob.glob("/tmp/plugoutbeacon*"):
             os.remove(filename)
-        subprocess.Popen(("/usr/bin/tshark -I -i " + wlan + " -b files:4 -b filesize:1000 -w /tmp/tshark-temp").split(),
+        subprocess.Popen(("grabserial -d /dev/ttyUSB0 -b 57600 -o /tmp/plugoutbeacon").split(),
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if tshark_is_running():
             logger.info("Starting scan")
@@ -129,7 +129,7 @@ def start_scan(wlan):
 
 def stop_scan():
     if tshark_is_running():
-        os.system("pkill -9 tshark")
+        os.system("pkill -9 grabserial")
         if not tshark_is_running():
             logger.info("Stopped scan")
 
@@ -170,7 +170,7 @@ def main():
     parser.add_argument(
         "-s",
         "--server",
-        default="https://lf.internalpositioning.com",
+        default="https://emerson.local:",
         help="send payload to this server")
     parser.add_argument("-n", "--nodebug", action="store_true")
     args = parser.parse_args()
