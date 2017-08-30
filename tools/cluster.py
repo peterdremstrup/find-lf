@@ -67,7 +67,7 @@ class CommandThread (threading.Thread):
         elif self.command == "start":
             self.start_pi()
         elif self.command == "update" or self.command == "download":
-            self.update_scanpy() 
+            self.update_scanpy()
         elif self.command == "initialize":
             self.initialize()
         elif self.command == "restart":
@@ -213,7 +213,7 @@ class CommandThread (threading.Thread):
         c = 'ssh -o ConnectTimeout=10 %(address)s "sudo nohup python3 scan.py --interface %(wlan)s --time %(scantime)d --group %(group)s --server %(lfserver)s < /dev/null > std.out 2> std.err &"'
         r, code = run_command(
             c % {'address': self.config['address'],
-                 'group': self.config['group'], 
+                 'group': self.config['group'],
                  'lfserver': self.config['lfserver'],
                  'wlan': self.config['wlan'],
                  'scantime': self.config['scantime']
@@ -250,7 +250,7 @@ class CommandThread (threading.Thread):
         if code == 255:
             self.logger.info("unable to connect")
             return
-        c = 'ssh %(address)s "wget https://raw.githubusercontent.com/schollz/find-lf/master/node/initialize.sh"'
+        c = 'ssh %(address)s "wget https://raw.githubusercontent.com/peterdremstrup/find-lf/master/node/initialize.sh"'
         r, code = run_command(
             c % {'address': self.config['address'], 'group': self.config['group'], 'lfserver': self.config['lfserver']})
         self.logger.debug(r)
