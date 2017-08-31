@@ -230,7 +230,7 @@ class CommandThread (threading.Thread):
             self.logger.info("could not start")
 
     def update_scanpy(self):
-        c = 'ssh -o ConnectTimeout=10 %(address)s "sudo wget https://raw.githubusercontent.com/schollz/find-lf/master/node/scan.py -O scan.py"'
+        c = 'ssh -o ConnectTimeout=10 %(address)s "sudo wget https://raw.githubusercontent.com/peterdremstrup/find-lf/master/node/scan.py -O scan.py"'
         r, code = run_command(
             c % {'address': self.config['address']})
         self.logger.debug(r)
@@ -242,7 +242,7 @@ class CommandThread (threading.Thread):
 
     def initialize(self):
         self.logger.info("initializing...")
-        c = 'ssh -o ConnectTimeout=10 %(address)s "rm initialize.sh"'
+        c = 'ssh -v -o ConnectTimeout=10 %(address)s "rm initialize.sh"'
         r, code = run_command(
             c % {'address': self.config['address'], 'group': self.config['group'], 'lfserver': self.config['lfserver']})
         self.logger.debug(r)
@@ -372,16 +372,17 @@ def main(args, config):
                 lines.append(line.split("for ")[1])
         print("\n".join(sorted(list(set(lines)))))
         return
-    elif command == "initialize":
-        print("copying ips")
-        for address in config['pis']:
-            c = 'ssh-copy-id %(address)s'
-            r, code = run_command(c % {'address': address})
-            if code == 1:
-                print("Could not connect to %s" % address)
-                return
-            logger.debug(r)
-            logger.debug(code)
+#     elif command == "initialize":
+#         print("copying ips")
+#         for address in config['pis']:
+#             c = 'ssh-copy-id %(address)s'
+#             print(c % {'address': address['address']})
+#             r, code = run_command(c % {'address': address['address']})
+#             if code == 1:
+#                 print("Could not connect to %s" % address)
+#                 return
+#             logger.debug(r)
+#             logger.debug(code)
 
     threads = []
     for pi in config['pis']:

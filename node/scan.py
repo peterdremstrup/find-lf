@@ -44,29 +44,28 @@ def process_scan(time_window):
     output = ""
     maxFileNumber = -1
     fileNameToRead = ""
-    for filename in glob.glob("/tmp/plugoutbeacon"):
-        fileNumber = int(filename.split("_")[1])
-        if fileNumber > maxFileNumber:
-            maxFileNumber = fileNumber
-            fileNameToRead = filename
+    fileNameToRead = "/tmp/plugoutbeacon"
 
     logger.debug("Reading from %s" % fileNameToRead)
     cmd = subprocess.Popen(("tail /tmp/plugoutbeacon").split(
     ), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output += cmd.stdout.read().decode('utf-8')
-
+    logger.debug("%s" % output)
     timestamp_threshold = float(time.time()) - float(time_window)
     fingerprints = {}
     relevant_lines = 0
     for line in output.splitlines():
         try:
             timestamp, mac, mac2, power_levels = line.split("\t")
+	    
+            if float(timestamp) < time.time()-60000:
+              timestamp = time.time()
 
-            if mac == mac2 or float(timestamp) < timestamp_threshold or len(mac) == 0:
+            if mac == mac2 or len(mac) == 0:
                 continue
 
             relevant_lines+=1
-            rssi = power_levels.split(',')[0]
+            rssi = power_levels
             if len(rssi) == 0:
                 continue
 
@@ -145,9 +144,9 @@ def main():
     # Test if wlan0 / wlan1
     default_wlan = "wlan1"
     default_single_wifi = False
-    if num_wifi_cards() == 1:
-        default_single_wifi = True
-        default_wlan = "wlan0"
+    #if num_wifi_cards() == 1:
+    #    default_single_wifi = True
+    #    default_wlan = "wlan0"
 
     # Parse arguments
     parser = argparse.ArgumentParser()
