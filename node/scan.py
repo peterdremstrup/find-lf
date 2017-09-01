@@ -57,7 +57,7 @@ def process_scan(time_window):
     for line in output.splitlines():
         try:
             timestamp, mac, mac2, power_levels = line.split("\t")
-	    
+
             if float(timestamp) < time.time()-60000:
               timestamp = time.time()
 
@@ -169,7 +169,7 @@ def main():
     parser.add_argument(
         "-s",
         "--server",
-        default="https://emerson.local:",
+        default="https://emerson.local:8003",
         help="send payload to this server")
     parser.add_argument("-n", "--nodebug", action="store_true")
     args = parser.parse_args()
@@ -224,6 +224,9 @@ def main():
             logger.error("Fatal error in main loop", exc_info=True)
             time.sleep(float(args.time))
 
+while True:
+    restart_wifi()
+    time.sleep(1800)
 
 def exit_handler():
     print("Exiting...stopping scan..")
