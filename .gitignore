@@ -1,3 +1,6 @@
+server/switches.json
+tools/config.json
+tools/cluster.log
 *.sw0
 *.swo
 *.swp

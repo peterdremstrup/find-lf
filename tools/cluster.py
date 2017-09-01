@@ -230,7 +230,7 @@ class CommandThread (threading.Thread):
             self.logger.info("could not start")
 
     def update_scanpy(self):
-        c = 'ssh -o ConnectTimeout=10 %(address)s "sudo wget https://raw.githubusercontent.com/peterdremstrup/find-lf/master/node/scan.py -O scan.py"'
+        c = 'ssh -o ConnectTimeout=10 %(address)s "sudo wget https://raw.githubusercontent.com/peterdremstrup/find-lf/master/node/scan.py -O scan.py && sudo wget https://raw.githubusercontent.com/peterdremstrup/find-lf/master/node/signal.pd -O signal.pd"'
         r, code = run_command(
             c % {'address': self.config['address']})
         self.logger.debug(r)

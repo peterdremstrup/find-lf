@@ -70,7 +70,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	flag.StringVar(&Port, "port", "8072", "port to run this server on (default: 8072)")
-	flag.StringVar(&ServerAddress, "server", "https://ml.internalpositioning.com", "address to FIND server")
+	flag.StringVar(&ServerAddress, "server", "http://emerson.local:8003", "address to FIND server")
 	flag.IntVar(&MinimumNumberOfRouters, "min", 0, "minimum number of routers before sending fingerprint")
 	flag.IntVar(&MinRSSI, "rssi", -60, "minimum RSSI that must exist to send on")
 	flag.IntVar(&CollectionTime, "time", 10, "collection time to average fingerprints (in seconds)")
